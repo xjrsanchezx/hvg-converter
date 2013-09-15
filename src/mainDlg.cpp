@@ -14,13 +14,14 @@
 #include "mainDlg.h"
 
 #include <iostream>
+
 #include <QtSql>
+#include <QMessageBox>
 
 MainDlg::MainDlg(QWidget *parent /*= 0*/)
 	: QMainWindow(parent)
 {
-	ui.setupUi(this);	
-
+	ui.setupUi(this);		
 }
 
 MainDlg::~MainDlg()
@@ -31,6 +32,7 @@ MainDlg::~MainDlg()
 bool MainDlg::setDatabaseFile(const QString& dbName)
 {
 	_accessDBName = dbName;
+	_dbPath = QFileInfo(dbName).absoluteDir();
 
 	QSqlDatabase db;
 
@@ -55,6 +57,39 @@ bool MainDlg::setDatabaseFile(const QString& dbName)
 	ui.nameComboBox->addItems( _dbColumns );
 	ui.romComboBox->addItems( _dbColumns );
 
+	// connect the button
+	connect(ui.convertButton, SIGNAL(clicked()), this, SLOT(convert()));
 
 	return true;
+}
+
+void MainDlg::convert()
+{
+	QString machineName = ui.machineNameEdit->text();
+	QString machineDescription = ui.descriptionEdit->toPlainText();
+
+	// The machine name is required
+	if(machineName == "")
+	{
+		std::cerr << "The machine name is required" << std::endl;
+
+		QMessageBox::critical(0, "Error", "The machine name is required", QMessageBox::Ok);		
+		return;
+	}
+
+	QSqlDatabase db;
+
+	// Find QSLite driver and create the file
+    db = QSqlDatabase::addDatabase("QSQLITE");
+	QString dbFileName = _dbPath.filePath("machine.sqlite");
+	db.setDatabaseName(dbFileName);
+
+	// Open the database
+	if (!db.open()) 
+	{
+		QMessageBox::critical(0, "Error", " Error creating SQLITE database", QMessageBox::Ok);
+		return;
+	}
+
+	std::cout << "convert" << std::endl;
 }

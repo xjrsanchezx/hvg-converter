@@ -16,6 +16,7 @@
 #define MAINDLG_H
 
 #include <QtWidgets/QMainWindow>
+#include <qdir.h>
 #include "ui_converter_main.h"
 
 class MainDlg : public QMainWindow
@@ -28,9 +29,13 @@ public:
 
 	bool setDatabaseFile(const QString& dbName);
 
+private slots:
+	void convert();						///< starts the conversion
+
 private:
 	Ui::MainDlgClass ui;
 
+	QDir _dbPath;						///< Path to the database directory
 	QString _accessDBName;				///< Name of the original database
 	QStringList _dbColumns;				///< Columns in the original database
 };
