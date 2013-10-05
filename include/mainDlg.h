@@ -33,6 +33,9 @@ private slots:
 	void convert();						///< starts the conversion
 
 private:
+	bool getOriginalDatabaseColumn(const QString& column, QStringList& records);	///< Gets all the records from a given column
+
+private:
 	Ui::MainDlgClass ui;
 
 	QDir _dbPath;						///< Path to the database directory
