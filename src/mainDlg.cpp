@@ -17,6 +17,7 @@
 
 #include <QtSql>
 #include <QMessageBox>
+#include <QProgressDialog>
 
 MainDlg::MainDlg(QWidget *parent /*= 0*/)
 	: QMainWindow(parent)
@@ -73,7 +74,7 @@ void MainDlg::convert()
 {
 	QString machineName = ui.machineNameEdit->text();
 	QString machineDescription = ui.descriptionEdit->toPlainText();
-
+		
 	// The machine name is required
 	if(machineName == "")
 	{
@@ -145,14 +146,30 @@ void MainDlg::convert()
 				   "name varchar(128), "
                    "rom varchar(128))");
 	query.clear();
+
 	
+	// open the progress dialog
+	QProgressDialog progress("Converting the database...", QString(), 0, romNameList.size(), this);
+    progress.setWindowModality(Qt::WindowModal);
+
+
 	// insert the roms
 	QSqlQuery batchQuery;
 	queryString = "INSERT INTO games values (NULL, :romName, :romFile)";
 	batchQuery.prepare(queryString);
-	batchQuery.addBindValue(romNameList);
-	batchQuery.addBindValue(romFileList);
-	batchQuery.execBatch();
+
+	for(int i=0; i<romNameList.size(); i++)
+	{
+		batchQuery.bindValue(":romName", romNameList[i]);
+		batchQuery.bindValue(":romFile", romFileList[i]);
+		batchQuery.exec();
+		progress.setValue(i+1);
+	}
+
+
+//	batchQuery.addBindValue(romNameList);
+//	batchQuery.addBindValue(romFileList);
+//	batchQuery.execBatch();
 	batchQuery.clear();
 
 	// close the database	
