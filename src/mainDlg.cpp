@@ -11,6 +11,13 @@
  */
 
 
+#define CLOSE_DB(db) 	{QString connection = (db)->connectionName(); \
+						(db)->close(); \
+						delete (db); \
+						QSqlDatabase::removeDatabase(connection); }
+						
+				
+
 #include "mainDlg.h"
 
 #include <iostream>
@@ -43,6 +50,8 @@ bool MainDlg::setDatabaseFile(const QString& dbName)
 	if (!db->open()) 
 	{
 		std::cerr << "GameListModel: Game database not found!" << std::endl;
+
+		CLOSE_DB(db)
 		return false;
 	}
 
@@ -50,8 +59,7 @@ bool MainDlg::setDatabaseFile(const QString& dbName)
 	QSqlRecord record=db->record(tableName);			// Get its columns
 
 	QString connection = db->connectionName();
-	db->close();
-	delete db;
+	CLOSE_DB(db)
 
 	QSqlDatabase::removeDatabase(connection);
 
@@ -114,6 +122,9 @@ void MainDlg::convert()
 		if( !QFile::remove(dbFileName) )
 		{
 			QMessageBox::critical(0, "Error", "The SQLite database is locked", QMessageBox::Ok);		
+			// close the database	
+			CLOSE_DB(db)
+
 			return;
 		}
 	}
@@ -124,6 +135,9 @@ void MainDlg::convert()
 	if (!db->open()) 
 	{
 		QMessageBox::critical(0, "Error", " Error creating SQLITE database", QMessageBox::Ok);
+		// close the database	
+		CLOSE_DB(db)
+
 		return;
 	}
 
@@ -173,11 +187,7 @@ void MainDlg::convert()
 	batchQuery.clear();
 
 	// close the database	
-	QString connection = db->connectionName();
-	db->close();
-	delete db;
-	
-	QSqlDatabase::removeDatabase(connection);
+	CLOSE_DB(db)
 
 	std::cout << "convert" << std::endl;
 }
@@ -197,6 +207,9 @@ bool MainDlg::getOriginalDatabaseColumn(const QString& column, QStringList& reco
 	if (!db->open()) 
 	{
 		std::cerr << "GameListModel: Game database not found!" << std::endl;
+
+		CLOSE_DB(db)
+
 		return false;
 	}
 
@@ -213,11 +226,7 @@ bool MainDlg::getOriginalDatabaseColumn(const QString& column, QStringList& reco
 
 	query.clear();
 
-	QString connection = db->connectionName();
-	db->close();
-	delete db;
-	
-	QSqlDatabase::removeDatabase(connection);
+	CLOSE_DB(db)
 
 	return true;
 }
