@@ -29,6 +29,14 @@ QT5_WRAP_UI(UIS_HDRS ${HVG_CONVERTER_FORMS} )
 INCLUDE_DIRECTORIES( include )
 SET( EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin )
 
-ADD_EXECUTABLE (hvg_converter  ${HVG_CONVERTER_SRC} ${HVG_CONVERTER_H} ${UIS_HDRS}) 
+# used to keep from opening a console
+SET(GUI_TYPE)
+
+IF(WIN32)
+	SET(GUI_TYPE WIN32)
+ENDIF(WIN32)
+
+
+ADD_EXECUTABLE (hvg_converter ${GUI_TYPE} ${HVG_CONVERTER_SRC} ${HVG_CONVERTER_H} ${UIS_HDRS}) 
 
 qt5_use_modules(hvg_converter  Widgets Sql)
