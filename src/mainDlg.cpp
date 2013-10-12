@@ -75,10 +75,19 @@ bool MainDlg::setDatabaseFile(const QString& dbName)
 
 	// connect the buttons
 	connect(ui.convertButton, SIGNAL(clicked()), this, SLOT(convert()));
+	connect(ui.romFolderExploreButton, SIGNAL(clicked()), this, SLOT(romFolderExplore()));
 	connect(ui.infoExploreButton, SIGNAL(clicked()), this, SLOT(infoExplore()));
 	connect(ui.emulatorExploreButton, SIGNAL(clicked()), this, SLOT(emulatorExplore()));
 
 	return true;
+}
+
+void MainDlg::romFolderExplore()
+{
+	QString dirName = QFileDialog::getExistingDirectory(this, "Select the ROM folder", "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+	dirName = _dbPath.relativeFilePath(dirName);
+	ui.romFolderEdit->setText(dirName);
 }
 
 void MainDlg::infoExplore()
@@ -101,6 +110,7 @@ void MainDlg::convert()
 {
 	QString machineName = ui.machineNameEdit->text();
 	QString machineDescription = ui.descriptionEdit->toPlainText();
+	QString romFolder = ui.romFolderEdit->text();
 	QString infoURL = ui.infoURLEdit->text();
 	QString emulatorExe = ui.emulatorEdit->text();
 		
@@ -176,14 +186,16 @@ void MainDlg::convert()
                    "(name varchar(64), "
                    "description varchar(1024),"
 				   "infoURL varchar(1024), "
-				   "emulator varchar(1024) )");
+				   "emulator varchar(1024),"
+				   "romFolder varchar(1024) )");
 
-	QString queryString = "INSERT INTO machine values (:machineName, :machineDescription, :infoURL, :emulator)";
+	QString queryString = "INSERT INTO machine values (:machineName, :machineDescription, :infoURL, :emulator, :romFolder)";
 	query.prepare(queryString);
 	query.bindValue(":machineName", machineName);
 	query.bindValue(":machineDescription", machineDescription);
 	query.bindValue(":infoURL", infoURL);
 	query.bindValue(":emulator", emulatorExe);
+	query.bindValue(":romFolder", romFolder);
 	query.exec();
 	query.clear();
 	
