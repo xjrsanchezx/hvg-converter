@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>406</width>
-    <height>331</height>
+    <height>417</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>sampleWeb</string>
+   <string>HVG database converter</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -204,7 +204,7 @@
         <item>
          <widget class="QLabel" name="label_5">
           <property name="text">
-           <string>Info URL:</string>
+           <string>Info URL:       </string>
           </property>
          </widget>
         </item>
@@ -215,6 +215,39 @@
          <widget class="QPushButton" name="infoExploreButton">
           <property name="text">
            <string>Explore...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <property name="leftMargin">
+         <number>10</number>
+        </property>
+        <property name="topMargin">
+         <number>10</number>
+        </property>
+        <property name="rightMargin">
+         <number>10</number>
+        </property>
+        <property name="bottomMargin">
+         <number>10</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Emulator exe:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="emulatorEdit"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="emulatorExploreButton">
+          <property name="text">
+           <string>Explore....</string>
           </property>
          </widget>
         </item>

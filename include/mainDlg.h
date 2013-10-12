@@ -32,6 +32,7 @@ public:
 private slots:
 	void convert();						///< starts the conversion
 	void infoExplore();					///< Opens a dialog to select the html with the description
+	void emulatorExplore();				///< Opens a dialog to select the emulator exe
 
 private:
 	bool getOriginalDatabaseColumn(const QString& column, QStringList& records);	///< Gets all the records from a given column

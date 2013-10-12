@@ -76,6 +76,8 @@ bool MainDlg::setDatabaseFile(const QString& dbName)
 	// connect the buttons
 	connect(ui.convertButton, SIGNAL(clicked()), this, SLOT(convert()));
 	connect(ui.infoExploreButton, SIGNAL(clicked()), this, SLOT(infoExplore()));
+	connect(ui.emulatorExploreButton, SIGNAL(clicked()), this, SLOT(emulatorExplore()));
+
 	return true;
 }
 
@@ -87,11 +89,20 @@ void MainDlg::infoExplore()
 	ui.infoURLEdit->setText(fileName);
 }
 
+void MainDlg::emulatorExplore()
+{
+	QString fileName = QFileDialog::getOpenFileName(this, "Select the emulator executable", "", "Emulator executable (*.*)");
+
+	fileName = _dbPath.relativeFilePath(fileName);
+	ui.emulatorEdit->setText(fileName);
+}
+
 void MainDlg::convert()
 {
 	QString machineName = ui.machineNameEdit->text();
 	QString machineDescription = ui.descriptionEdit->toPlainText();
 	QString infoURL = ui.infoURLEdit->text();
+	QString emulatorExe = ui.emulatorEdit->text();
 		
 	// The machine name is required
 	if(machineName == "")
@@ -99,6 +110,14 @@ void MainDlg::convert()
 		std::cerr << "The machine name is required" << std::endl;
 
 		QMessageBox::critical(0, "Error", "The machine name is required", QMessageBox::Ok);		
+		return;
+	}
+
+	if(emulatorExe == "")
+	{
+		std::cerr << "The machine name is required" << std::endl;
+
+		QMessageBox::critical(0, "Error", "The emulator path is required", QMessageBox::Ok);		
 		return;
 	}
 
@@ -156,13 +175,15 @@ void MainDlg::convert()
 	query.exec("CREATE TABLE if not exists machine "
                    "(name varchar(64), "
                    "description varchar(1024),"
-				   "infoURL)");
+				   "infoURL varchar(1024), "
+				   "emulator varchar(1024) )");
 
-	QString queryString = "INSERT INTO machine values (:machineName, :machineDescription, :infoURL)";
+	QString queryString = "INSERT INTO machine values (:machineName, :machineDescription, :infoURL, :emulator)";
 	query.prepare(queryString);
 	query.bindValue(":machineName", machineName);
 	query.bindValue(":machineDescription", machineDescription);
 	query.bindValue(":infoURL", infoURL);
+	query.bindValue(":emulator", emulatorExe);
 	query.exec();
 	query.clear();
 	
