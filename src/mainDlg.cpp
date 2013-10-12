@@ -10,7 +10,7 @@
  * \copyright MIT License (MIT)
  */
 
-
+/// Macro that closes a sqlite database cleanly
 #define CLOSE_DB(db) 	{QString connection = (db)->connectionName(); \
 						(db)->close(); \
 						delete (db); \
@@ -25,6 +25,7 @@
 #include <QtSql>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QFileDialog>
 
 MainDlg::MainDlg(QWidget *parent /*= 0*/)
 	: QMainWindow(parent)
@@ -72,16 +73,25 @@ bool MainDlg::setDatabaseFile(const QString& dbName)
 	ui.nameComboBox->addItems( _dbColumns );
 	ui.romComboBox->addItems( _dbColumns );
 
-	// connect the button
+	// connect the buttons
 	connect(ui.convertButton, SIGNAL(clicked()), this, SLOT(convert()));
-
+	connect(ui.infoExploreButton, SIGNAL(clicked()), this, SLOT(infoExplore()));
 	return true;
+}
+
+void MainDlg::infoExplore()
+{
+	QString fileName = QFileDialog::getOpenFileName(this, "Select the HTML with the info", "", "HTML pages (*.html *.htm)");
+
+	fileName = _dbPath.relativeFilePath(fileName);
+	ui.infoURLEdit->setText(fileName);
 }
 
 void MainDlg::convert()
 {
 	QString machineName = ui.machineNameEdit->text();
 	QString machineDescription = ui.descriptionEdit->toPlainText();
+	QString infoURL = ui.infoURLEdit->text();
 		
 	// The machine name is required
 	if(machineName == "")
@@ -145,12 +155,14 @@ void MainDlg::convert()
 	QSqlQuery query;
 	query.exec("CREATE TABLE if not exists machine "
                    "(name varchar(64), "
-                   "description varchar(1024))");
+                   "description varchar(1024),"
+				   "infoURL)");
 
-	QString queryString = "INSERT INTO machine values (:machineName, :machineDescription)";
+	QString queryString = "INSERT INTO machine values (:machineName, :machineDescription, :infoURL)";
 	query.prepare(queryString);
 	query.bindValue(":machineName", machineName);
 	query.bindValue(":machineDescription", machineDescription);
+	query.bindValue(":infoURL", infoURL);
 	query.exec();
 	query.clear();
 	
@@ -165,6 +177,7 @@ void MainDlg::convert()
 	// open the progress dialog
 	QProgressDialog progress("Converting the database...", QString(), 0, romNameList.size(), this);
     progress.setWindowModality(Qt::WindowModal);
+	progress.setValue(0);
 
 
 	// insert the roms
